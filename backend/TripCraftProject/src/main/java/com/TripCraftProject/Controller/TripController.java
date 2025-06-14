@@ -164,8 +164,9 @@ public class TripController {
         Optional<Destination> destinationOpt = destinationRepository.findByDestinationIgnoreCase(trip.getDestination());
 
         List<Destination.Spot> spots = new ArrayList<>();
-        Destination.Hotel lunch = null;
-        Destination.Hotel stay = null;
+        List<Destination.Hotel> lunch = new ArrayList<>();
+        List<Destination.Hotel> stay = new ArrayList<>();
+
 
         if (destinationOpt.isPresent()) {
             Destination destination = destinationOpt.get();
@@ -179,9 +180,9 @@ public class TripController {
             if (destination.getHotels() != null) {
                 for (Destination.Hotel hotel : destination.getHotels()) {
                     if ("Lunch".equalsIgnoreCase(hotel.getStayType()) && lunch == null) {
-                        lunch = hotel;
+                        lunch.add(hotel);
                     } else if ("Stay".equalsIgnoreCase(hotel.getStayType()) && stay == null) {
-                        stay = hotel;
+                        stay.add(hotel);
                     }
                 }
             }
