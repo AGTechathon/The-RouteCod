@@ -6,10 +6,10 @@ import Home from './components/Home';
 // import Reviews from './components/Reviews';
 // import Footer from './components/Footer';
 import { Toaster } from 'react-hot-toast';
-import ProtectedRoute from './routes/ProtectedRoute';
-import DashboardRoutes from './routes/DashboardRoutes';
-import LoginRedirectWrapper from './routes/LoginRedirectWrapper';
-import SignupRedirectWrapper from './routes/SignupRedirectWrapper';
+// import ProtectedRoute from './routes/ProtectedRoute';
+// import DashboardRoutes from './routes/DashboardRoutes';
+// import LoginRedirectWrapper from './routes/LoginRedirectWrapper';
+// import SignupRedirectWrapper from './routes/SignupRedirectWrapper';
 
 function App() {
   return (
@@ -26,13 +26,13 @@ function App() {
               {/* <Footer /> */}
             </>
           } />
-          <Route path="/login" element={<LoginRedirectWrapper />} />
+          {/* <Route path="/login" element={<LoginRedirectWrapper />} />
           <Route path="/signup" element={<SignupRedirectWrapper />} />
           <Route path="/dashboard/*" element={
             <ProtectedRoute>
               <DashboardRoutes />
             </ProtectedRoute>
-          } />
+          } /> */}
         </Routes>
       </div>
     </Router>
