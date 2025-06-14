@@ -22,8 +22,6 @@ import com.TripCraftProject.Repository.UserRepo;
 import com.TripCraftProject.model.LoginRequest;
 import com.TripCraftProject.model.User;
 
-
-
 @Service
 public class UserService {
 
@@ -36,8 +34,6 @@ public class UserService {
     @Autowired
     private UserRepo repo;
     
-    @Autowired
-    private TripRepository tripRepository;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -84,26 +80,7 @@ public class UserService {
                 User loggedInUser = optionalUser.get();
                 String name = loggedInUser.getName();
 
-                // 🔁 Check if this user is a collaborator on any trip
-                List<Trip> trips = tripRepository.findByCollaboratorsEmail(user.getEmail());
-
-                for (Trip trip : trips) {
-                    boolean updated = false;
-
-                    for (Collaborator collaborator : trip.getCollaborators()) {
-                        if (collaborator.getEmail().equalsIgnoreCase(user.getEmail())
-                                && (collaborator.getUserId() == null || collaborator.getUserId().isEmpty())) {
-                            collaborator.setUserId(loggedInUser.getId());
-                            updated = true;
-                        }
-                    }
-
-                    if (updated) {
-                        tripRepository.save(trip); // Save only if updates were made
-                    }
-                }
-
-                // ✅ JSON response with name
+                               // ✅ JSON response with name
                 Map<String, String> responseBody = new HashMap<>();
                 responseBody.put("message", "Login successful");
                 responseBody.put("name", name);
