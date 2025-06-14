@@ -1,11 +1,17 @@
 package com.TripCraftProject.Controller;
 
 import com.TripCraftProject.Repository.DestinationRepository;
+import com.TripCraftProject.Repository.ItineraryRepository;
 import com.TripCraftProject.Repository.TripRepository;
 import com.TripCraftProject.Repository.UserRepo;
+import com.TripCraftProject.Services.EmailSenderService;
 import com.TripCraftProject.Services.TripService;
+import com.TripCraftProject.model.Collaborator;
 import com.TripCraftProject.model.Destination;
+import com.TripCraftProject.model.Itinerary;
+import com.TripCraftProject.model.Itinerary;
 import com.TripCraftProject.model.Trip;
+import com.TripCraftProject.model.User;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,7 +54,13 @@ public class TripController {
     private RestTemplate restTemplate;
     @Autowired
 	private DestinationRepository destinationRepository;
-   
+    @Autowired
+    private ItineraryRepository itineraryRepository;
+    @Autowired
+    private GeminiController geminiController;
+    @Autowired
+    private EmailSenderService emailSenderService;
+  
     @Value("${python.microservice.url:http://localhost:5000/generate_itinerary}")
     private String pythonMicroserviceUrl;
     
@@ -106,6 +118,23 @@ public class TripController {
         trip.setUserId(userId);
         trip.setAiGenerated(false);
      
+        if (trip.getCollaborators() == null) {
+            trip.setCollaborators(new ArrayList<>());
+        } else {
+            for (Collaborator collaborator : trip.getCollaborators()) {
+            	
+            	Optional<User> userCollab = userRepository.findByEmail(collaborator.getEmail());
+            	userCollab.ifPresent(value -> collaborator.setUserId(value.getId()));
+
+                String subject = "New Trip Added!";
+                String body = "Hi there!\r\n"
+                        + "You've been added as a collaborator to an exciting new trip planned on TripCraft. "
+                        + "The trip is headed to " + trip.getDestination() + " from " + trip.getStartDate() + " to " + trip.getEndDate() + ". "
+                        + "As a "  + ", you'll be able to view and contribute to the trip details. "
+                        + "Log in to your TripCraft account to explore the plan and join the adventure!\r\n";
+                emailSenderService.sendEmail(collaborator.getEmail(), subject, body);
+            }
+        }
         trip.setCreatedAt(LocalDateTime.now());
         String randomThumbnail = imageUrls.get(new Random().nextInt(imageUrls.size()));
         trip.setThumbnail(randomThumbnail);
@@ -194,5 +223,177 @@ public class TripController {
         return userId;
     }
     
-   
+    public static class TripResponse {
+        private Trip trip;
+        private Itinerary itinerary;
+
+        public Trip getTrip() { return trip; }
+        public void setTrip(Trip trip) { this.trip = trip; }
+        public Itinerary getItinerary() { return itinerary; }
+        public void setItinerary(Itinerary itinerary) { this.itinerary = itinerary; }
+    }
+    
+
+    @PostMapping
+    public ResponseEntity<?> createTripAndItinerary(@RequestBody Trip trip) {
+        // Step 1: Set required fields
+    	String userId = getCurrentUserId();
+    	trip.setUserId(userId);
+        trip.setAiGenerated(true); // Set isAiGenerated to true as per requirement
+        trip.setStatus("Planned");
+        trip.setCreatedAt(LocalDateTime.now()); // Set current time
+        String randomThumbnail = imageUrls.get(new Random().nextInt(imageUrls.size()));
+        trip.setThumbnail(randomThumbnail);
+
+        if (trip.getCollaborators() == null) {
+            trip.setCollaborators(new ArrayList<>());
+        } else {
+            for (Collaborator collaborator : trip.getCollaborators()) {
+            	
+            	Optional<User> userCollab = userRepository.findByEmail(collaborator.getEmail());
+            	userCollab.ifPresent(value -> collaborator.setUserId(value.getId()));
+
+                String subject = "New Trip Added!";
+                String body = "Hi there!\r\n"
+                        + "You've been added as a collaborator to an exciting new trip planned on TripCraft. "
+                        + "The trip is headed to " + trip.getDestination() + " from " + trip.getStartDate() + " to " + trip.getEndDate() + ". "
+                        + "As a "  + ", you'll be able to view and contribute to the trip details. "
+                        + "Log in to your TripCraft account to explore the plan and join the adventure!\r\n";
+                emailSenderService.sendEmail(collaborator.getEmail(), subject, body);
+            }
+        }
+
+        // Step 3: Check if destination exists in the database
+        boolean destinationExists = destinationRepository.existsByDestination(trip.getDestination());
+
+        // Step 4: Call appropriate service based on destination existence
+        Itinerary itinerary;
+        Destination destination;
+        if (!destinationExists) {
+        	destination = callGeminiService(trip.getDestination());
+        	System.out.println("Gemini response "+destination);
+        }
+        itinerary = callPythonMicroservice(trip);
+        System.out.println("model response "+itinerary);
+        // Step 5: Save Trip first to get its ID
+        Trip savedTrip = tripRepository.save(trip);
+
+        // Step 6: Set tripId in Itinerary and save
+        itinerary.setTripId(savedTrip.getId());
+        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+
+        // Step 7: Prepare response
+        TripResponse response = new TripResponse();
+        response.setTrip(savedTrip);
+        response.setItinerary(savedItinerary);
+
+        return ResponseEntity.ok(response);
+    }
+    
+    public Destination callGeminiService(String destination) {
+        ResponseEntity<?> response = geminiController.generateSpotsAndHotels(destination);
+        if (response.getStatusCode() != HttpStatus.OK) {
+            throw new RuntimeException("Failed to fetch spots/hotels from Gemini: " + response.getBody());
+        }
+
+        String jsonResponse = (String) response.getBody();
+        try {
+            String cleanedJson = cleanJsonResponse(jsonResponse);
+            return saveDataToMongo(cleanedJson, destination);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse and save Gemini response: " + e.getMessage(), e);
+        }
+    }
+    private String cleanJsonResponse(String response) {
+        return response
+            .replaceAll("```json\\s*", "")
+            .replaceAll("```\\s*", "")
+            .trim();
+    }
+    private Destination saveDataToMongo(String cleanedJson, String destinationName) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(cleanedJson);
+
+            List<Destination.Spot> spots = new ArrayList<>();
+            JsonNode spotsNode = rootNode.get("spots");
+            if (spotsNode != null && spotsNode.isArray()) {
+                for (JsonNode spotNode : spotsNode) {
+                    Destination.Spot spot = objectMapper.treeToValue(spotNode, Destination.Spot.class);
+                    spots.add(spot);
+                }
+            }
+
+            List<Destination.Hotel> hotels = new ArrayList<>();
+            JsonNode hotelsNode = rootNode.get("hotels");
+            if (hotelsNode != null && hotelsNode.isArray()) {
+                for (JsonNode hotelNode : hotelsNode) {
+                    Destination.Hotel hotel = objectMapper.treeToValue(hotelNode, Destination.Hotel.class);
+                    hotels.add(hotel);
+                }
+            }
+
+            Destination destination = new Destination();
+            destination.setDestination(destinationName);
+            destination.setSpots(spots);
+            destination.setHotels(hotels);
+            return destinationRepository.save(destination);
+        } catch (Exception e) {
+            System.err.println("Failed to extract/save spots and hotels: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Itinerary callPythonMicroservice(Trip trip) {
+        String flaskUrl = "http://localhost:5000/generate_itinerary";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode root = objectMapper.createObjectNode();       // Root JSON
+        ObjectNode tripNode = objectMapper.createObjectNode();   // Nested "trip" object
+
+        // Populate trip fields
+        tripNode.put("title", trip.getTitle());
+        tripNode.put("destination", trip.getDestination());
+        tripNode.put("startDate", trip.getStartDate().toString());
+        tripNode.put("endDate", trip.getEndDate().toString());
+        tripNode.put("budget", String.valueOf(trip.getBudget()));
+        tripNode.put("people", String.valueOf(trip.getPeople()));  // <-- Use direct people count
+
+        // Handle preferences
+        if (trip.getPreferences() != null) {
+            ArrayNode preferencesArray = objectMapper.valueToTree(trip.getPreferences());
+            tripNode.set("preferences", preferencesArray);
+        } else {
+            tripNode.set("preferences", objectMapper.createArrayNode());
+        }
+
+        // Handle collaborators
+        if (trip.getCollaborators() != null) {
+            ArrayNode collaboratorsArray = objectMapper.valueToTree(trip.getCollaborators());
+            tripNode.set("collaborators", collaboratorsArray);
+        } else {
+            tripNode.set("collaborators", objectMapper.createArrayNode());
+        }
+
+        // Add "trip" object to the root
+        root.set("trip", tripNode);
+
+        HttpEntity<String> entity = new HttpEntity<>(root.toString(), headers);
+
+        try {
+            ResponseEntity<Itinerary> response = restTemplate.exchange(
+                flaskUrl,
+                HttpMethod.POST,
+                entity,
+                Itinerary.class
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            throw new RuntimeException("Error calling Python microservice: " + e.getMessage(), e);
+        }
+    }
+  
 }
