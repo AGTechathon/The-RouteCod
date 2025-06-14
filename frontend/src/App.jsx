@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import ServiceSection from './components/ServiceSection';
 import Reviews from './components/Reviews';
-import Footer from './components/Footer';
+// import Footer from './components/Footer';
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './routes/ProtectedRoute';
 import DashboardRoutes from './routes/DashboardRoutes';
@@ -23,7 +23,7 @@ function App() {
               <Home />
               <ServiceSection />
               <Reviews />
-              <Footer />
+              {/* <Footer /> */}
             </>
           } />
           <Route path="/login" element={<LoginRedirectWrapper />} />
