@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
-	   @Autowired
+	  @Autowired
 	    private UserService service;
 
 
@@ -39,6 +39,11 @@ public class AuthenticationController {
 	   public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest user) {
 	       return service.verify(user);
 	   }
+
+	    @GetMapping("/dashboard")
+	    public String dash() {
+	    	return "Welcome";
+	    }
 	    @Autowired
 	    private  JWTService jwtService;
 	    @Autowired
