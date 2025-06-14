@@ -39,8 +39,8 @@ public class GeminiService {
             }
 
             Generate a JSON response with exactly two arrays:
-
-            1. "spots" – Include **all possible unique tourist spots** in and around the destination, covering:
+        	**unique data ** 
+            1. "spots" – Include **all possible unique tourist spots**  **at least 25 unique tourist spots**in and around the destination, covering:
                - name
                - location
                - category (e.g., history, food, relaxation, adventure, nightlife, art, spiritual, nature, cultural, shopping)
@@ -50,7 +50,7 @@ public class GeminiService {
                - longitude
                - latitude
 
-            2. "hotels" – Include a range of hotels from low to high budget near the above spots. For each hotel, provide:
+            2. "hotels" – **at least 25 unique tourist hotels** Include a range of hotels from low to high budget near the above spots. For each hotel, provide:
                - name
                - location
                - category (e.g., Luxury, Budget, Casual Dining)
