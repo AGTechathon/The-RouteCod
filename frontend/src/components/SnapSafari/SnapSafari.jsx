@@ -1,70 +1,74 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 
 const SnapSafari = () => {
   const [posts, setPosts] = useState([
     {
       id: 1,
-      image: './img/bbg1.jpg',
-      location: 'Santorini',
-      date: 'June 10, 2025',
-      description: 'Sunsets over the caldera were breathtaking! Loved this AI-planned gem.',
+      image: "./img/bbg1.jpg",
+      location: "Santorini",
+      date: "June 10, 2025",
+      description:
+        "Sunsets over the caldera were breathtaking! Loved this AI-planned gem.",
       likes: 342,
-      comments: ['Amazing view!', 'Wish I was there!'],
+      comments: ["Amazing view!", "Wish I was there!"],
     },
     {
       id: 2,
-      image: './img/bbg2.jpg',
-      location: 'Kyoto',
-      date: 'June 8, 2025',
-      description: 'Exploring temples with the AI plan was seamless. Cherry blossoms were amazing!',
+      image: "./img/bbg2.jpg",
+      location: "Kyoto",
+      date: "June 8, 2025",
+      description:
+        "Exploring temples with the AI plan was seamless. Cherry blossoms were amazing!",
       likes: 287,
-      comments: ['Stunning shot!', 'Love the colors!'],
+      comments: ["Stunning shot!", "Love the colors!"],
     },
     {
       id: 3,
-      image: './img/bbg3.jpg',
-      location: 'Machu Picchu',
-      date: 'June 5, 2025',
-      description: 'Hiked to the ruins with a perfect AI itinerary. Unforgettable!',
+      image: "./img/bbg3.jpg",
+      location: "Machu Picchu",
+      date: "June 5, 2025",
+      description:
+        "Hiked to the ruins with a perfect AI itinerary. Unforgettable!",
       likes: 198,
-      comments: ['Epic adventure!', 'Incredible place!'],
+      comments: ["Epic adventure!", "Incredible place!"],
     },
     {
       id: 4,
-      image: './img/bbg4.jpg',
-      location: 'Cape Town',
-      date: 'June 3, 2025',
-      description: 'Table Mountain views were stunning, thanks to AI suggestions.',
+      image: "./img/bbg4.jpg",
+      location: "Cape Town",
+      date: "June 3, 2025",
+      description:
+        "Table Mountain views were stunning, thanks to AI suggestions.",
       likes: 156,
-      comments: ['Wow, what a view!', 'Adding this to my list!'],
+      comments: ["Wow, what a view!", "Adding this to my list!"],
     },
   ]);
 
   const [selectedPost, setSelectedPost] = useState(null);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [caption, setCaption] = useState('');
+  const [caption, setCaption] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const commentSectionRef = useRef(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setSelectedImage(file);
     } else {
-      alert('Please select an image file.');
+      alert("Please select an image file.");
     }
   };
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -74,10 +78,10 @@ const SnapSafari = () => {
     e.stopPropagation();
     setDragActive(false);
     const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
+    if (file && file.type.startsWith("image/")) {
       setSelectedImage(file);
     } else {
-      alert('Please drop an image file.');
+      alert("Please drop an image file.");
     }
   };
 
@@ -91,15 +95,19 @@ const SnapSafari = () => {
           {
             id: posts.length + 1,
             image: e.target.result,
-            location: 'New Destination',
-            date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            location: "New Destination",
+            date: new Date().toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }),
             description: caption,
             likes: 0,
             comments: [],
           },
         ]);
         setSelectedImage(null);
-        setCaption('');
+        setCaption("");
         setShowUploadModal(false);
       };
       reader.readAsDataURL(selectedImage);
@@ -107,9 +115,11 @@ const SnapSafari = () => {
   };
 
   const handleLike = (postId) => {
-    setPosts(posts.map(post => 
-      post.id === postId ? { ...post, likes: post.likes + 1 } : post
-    ));
+    setPosts(
+      posts.map((post) =>
+        post.id === postId ? { ...post, likes: post.likes + 1 } : post
+      )
+    );
   };
 
   const handleCommentSubmit = (postId) => {
@@ -123,15 +133,18 @@ const SnapSafari = () => {
       );
       setSelectedPost((prevSelectedPost) =>
         prevSelectedPost && prevSelectedPost.id === postId
-          ? { ...prevSelectedPost, comments: [...prevSelectedPost.comments, newComment] }
+          ? {
+              ...prevSelectedPost,
+              comments: [...prevSelectedPost.comments, newComment],
+            }
           : prevSelectedPost
       );
-      setNewComment('');
+      setNewComment("");
     }
   };
 
   const handleCommentKeyDown = (e, postId) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleCommentSubmit(postId);
     }
@@ -139,7 +152,8 @@ const SnapSafari = () => {
 
   useEffect(() => {
     if (commentSectionRef.current) {
-      commentSectionRef.current.scrollTop = commentSectionRef.current.scrollHeight;
+      commentSectionRef.current.scrollTop =
+        commentSectionRef.current.scrollHeight;
     }
   }, [selectedPost?.comments]);
 
@@ -157,7 +171,9 @@ const SnapSafari = () => {
             alt="Profile"
             className="w-16 h-16 rounded-full object-cover mb-2 border-2 border-blue-600"
           />
-          <h2 className="text-2xl font-semibold text-gray-800 mb-1">Jane Doe</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-1">
+            Jane Doe
+          </h2>
           <p className="text-base text-blue-600 mb-3">@JaneWanderer</p>
           <div className="flex space-x-6 text-gray-600 text-sm">
             <span>{posts.length} Posts</span>
@@ -180,7 +196,7 @@ const SnapSafari = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 w-[80%] mx-auto"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 w-[80%] mx-auto mb-20"
         >
           {posts.map((post) => (
             <div
@@ -196,13 +212,25 @@ const SnapSafari = () => {
               <div className="absolute inset-0 bg-black/50 bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                 <div className="text-white flex items-center space-x-6">
                   <div className="flex items-center space-x-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     <span>{post.likes}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
                     </svg>
                     <span>{post.comments.length}</span>
@@ -210,7 +238,9 @@ const SnapSafari = () => {
                 </div>
               </div>
               <div className="p-3">
-                <h3 className="text-sm font-semibold text-blue-600">{post.location}</h3>
+                <h3 className="text-sm font-semibold text-blue-600">
+                  {post.location}
+                </h3>
                 <p className="text-xs text-gray-500">{post.date}</p>
               </div>
             </div>
@@ -226,7 +256,9 @@ const SnapSafari = () => {
               className="bg-white rounded-lg p-8 w-[90%] max-w-md"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">Share a Travel Moment</h3>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Share a Travel Moment
+                </h3>
                 <button
                   onClick={() => setShowUploadModal(false)}
                   className="text-gray-600 hover:text-gray-800"
@@ -237,7 +269,7 @@ const SnapSafari = () => {
               </div>
               <form onSubmit={handleImageSubmit} className="space-y-6">
                 <div
-                  className={`border-2 border-dashed ${dragActive ? 'border-blue-600' : 'border-gray-300'} rounded-lg p-8 text-center cursor-pointer`}
+                  className={`border-2 border-dashed ${dragActive ? "border-blue-600" : "border-gray-300"} rounded-lg p-8 text-center cursor-pointer`}
                   onClick={() => fileInputRef.current?.click()}
                   onDragEnter={handleDrag}
                   onDragOver={handleDrag}
@@ -252,7 +284,9 @@ const SnapSafari = () => {
                     />
                   ) : (
                     <div className="text-gray-500">
-                      <p className="text-base mb-2">Click or drag to upload an image</p>
+                      <p className="text-base mb-2">
+                        Click or drag to upload an image
+                      </p>
                       <p className="text-sm">Supported formats: JPG, PNG</p>
                     </div>
                   )}
@@ -265,7 +299,10 @@ const SnapSafari = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="caption" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="caption"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Caption
                   </label>
                   <textarea
@@ -304,13 +341,21 @@ const SnapSafari = () => {
               {/* Comments and Like: 40% Width */}
               <div className="w-[40%] p-4 flex flex-col">
                 <div className="flex-1 overflow-hidden">
-                  <h3 className="text-base font-semibold text-blue-600 mb-2">{selectedPost.location}</h3>
-                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">{selectedPost.description}</p>
-                  <div ref={commentSectionRef} className="h-[calc(100%-5.8rem)] overflow-y-scroll">
-                    {selectedPost
-
-.comments.map((comment, index) => (
-                      <p key={index} className="text-sm text-gray-500 mb-2 break-words">
+                  <h3 className="text-base font-semibold text-blue-600 mb-2">
+                    {selectedPost.location}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                    {selectedPost.description}
+                  </p>
+                  <div
+                    ref={commentSectionRef}
+                    className="h-[calc(100%-5.8rem)] overflow-y-scroll"
+                  >
+                    {selectedPost.comments.map((comment, index) => (
+                      <p
+                        key={index}
+                        className="text-sm text-gray-500 mb-2 break-words"
+                      >
                         @Doctor Strange: {comment}
                       </p>
                     ))}
@@ -323,8 +368,16 @@ const SnapSafari = () => {
                       className="flex items-center"
                       aria-label="Like post"
                     >
-                      <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>{selectedPost.likes}</span>
                     </button>
@@ -334,7 +387,9 @@ const SnapSafari = () => {
                       type="text"
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      onKeyDown={(e) => handleCommentKeyDown(e, selectedPost.id)}
+                      onKeyDown={(e) =>
+                        handleCommentKeyDown(e, selectedPost.id)
+                      }
                       placeholder="Add a comment..."
                       className="flex-1 p-2 text-sm border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                       aria-label="Comment input"
