@@ -42,25 +42,27 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
-	  @Autowired
-	    private TripService tripService;
 	@Autowired
     private  TripRepository tripRepository;
 	@Autowired
     private  UserRepo userRepository;
-       @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
+   
+	@Autowired
 	private DestinationRepository destinationRepository;
     @Autowired
     private ItineraryRepository itineraryRepository;
+    
+    @Autowired
+    private TripService tripService;
     @Autowired
     private GeminiController geminiController;
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
     private EmailSenderService emailSenderService;
-  
     @Value("${python.microservice.url:http://localhost:5000/generate_itinerary}")
     private String pythonMicroserviceUrl;
     
@@ -94,6 +96,12 @@ public class TripController {
                    .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // ✅ Create a new trip
+//    @PostMapping
+//    public ResponseEntity<Trip> createTrip(@RequestBody Trip trip) {
+//        Trip savedTrip = tripRepository.save(trip);
+//        return ResponseEntity.ok(savedTrip);
+//    }
     @GetMapping("/recent")
     public ResponseEntity<List<Trip>> getRecentTrips() {
     	String userId = getCurrentUserId();
@@ -113,11 +121,19 @@ public class TripController {
     public ResponseEntity<?> createTrip(@RequestBody Trip trip) {
 
     	String userId = getCurrentUserId(); // Returns email, e.g., "test@example.com"
+//        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+//        if (!userOptional.isPresent()) {
+//            Map<String, String> response = new HashMap<>();
+//            response.put("error", "User does not exist");
+//            return ResponseEntity.badRequest().body(response);
+//        }
+//
+//        User user = userOptional.get();
+//        String userId = user.getId(); // Get the MongoDB _id (e.g., "user123")
 
         // Step 1: Populate non-input fields
         trip.setUserId(userId);
         trip.setAiGenerated(false);
-     
         if (trip.getCollaborators() == null) {
             trip.setCollaborators(new ArrayList<>());
         } else {
@@ -135,6 +151,7 @@ public class TripController {
                 emailSenderService.sendEmail(collaborator.getEmail(), subject, body);
             }
         }
+
         trip.setCreatedAt(LocalDateTime.now());
         String randomThumbnail = imageUrls.get(new Random().nextInt(imageUrls.size()));
         trip.setThumbnail(randomThumbnail);
@@ -395,5 +412,6 @@ public class TripController {
             throw new RuntimeException("Error calling Python microservice: " + e.getMessage(), e);
         }
     }
+  
   
 }
