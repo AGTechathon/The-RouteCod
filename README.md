@@ -72,12 +72,12 @@ npm install
 npm run dev 
 
 2️⃣ Backend – Spring Boot (Java)
-```bash
+
 cd backend
 mvn clean install
 mvn spring-boot:run
 
 3️⃣ AI Engine – Python Flask Microservice
-```bash
+
 python save.py
 python app.py
