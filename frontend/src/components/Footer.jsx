@@ -1,19 +1,19 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 
 // Team member data with profile images
 const teamMembers = [
-  { id: 1, name: 'Priyanka Sundalam', image: './img/bbg1.jpg' },
-  { id: 2, name: 'Aditi Deshpande', image: './img/bbg2.jpg' },
-  { id: 3, name: 'Ankita Advitot', image: './img/bbg3.jpg' },
-  { id: 4, name: 'Tejas Jahagirdar', image: './img/bbg4.jpg' },
+  { id: 1, name: "Priyanka Sundalam", image: "./img/bbg1.jpg" },
+  { id: 2, name: "Aditi Deshpande", image: "./img/bbg2.jpg" },
+  { id: 3, name: "Ankita Advitot", image: "./img/bbg3.jpg" },
+  { id: 4, name: "Tejas Jahagirdar", image: "./img/bbg4.jpg" },
 ];
 
 const Footer = () => {
   // Animation variants for image
   const imageVariants = {
     initial: { scale: 1 },
-    hover: { scale: 1.5, transition: { duration: 0.3 } },
+    hover: { scale: 1.75, transition: { duration: 0.3 } },
   };
 
   // Animation variants for name
@@ -34,7 +34,7 @@ const Footer = () => {
         </div>
 
         {/* Right Side: Team Member Images */}
-        <div className="flex flex-col md:flex-row gap-6 items-center">
+        <div className="flex flex-col md:flex-row gap-7 items-center">
           {teamMembers.map((member) => (
             <motion.div
               key={member.id}
@@ -45,7 +45,7 @@ const Footer = () => {
               <motion.img
                 src={member.image}
                 alt={member.name}
-                className="w-14 h-14 rounded-full object-cover border-2 border-blue-600"
+                className="w-16 h-16 rounded-full object-cover border-2 border-blue-600"
                 variants={imageVariants}
               />
               <motion.span
