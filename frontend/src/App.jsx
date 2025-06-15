@@ -9,7 +9,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 import DashboardRoutes from './routes/DashboardRoutes';
 import LoginRedirectWrapper from './routes/LoginRedirectWrapper';
 import SignupRedirectWrapper from './routes/SignupRedirectWrapper';
-
+import Footer from "./components/Footer"
 function App() {
   return (
     <Router>
@@ -22,6 +22,7 @@ function App() {
               <Home />
               <ServiceSection />
               <Reviews />
+              <Footer />
             </>
           } />
           <Route path="/login" element={<LoginRedirectWrapper />} />

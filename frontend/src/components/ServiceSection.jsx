@@ -181,6 +181,8 @@ const ServiceSection = () => {
               <li>Smart Itinerary Optimization</li>
               <li>Automated Cost-Saving Suggestions</li>
               <li>AI Travel Assistant Chatbot</li>
+              <li>User Friendly UI</li>
+              <li>Customizable itinerary interface</li>
             </ul>
           </div>
         </div>
