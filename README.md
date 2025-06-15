@@ -39,8 +39,8 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 | **Spring Boot (Java)** | Backend API & Authentication |
 | **Python Flask** | AI-based itinerary & recommendation engine |
 | **MongoDB** | NoSQL Database |
-| **Google Maps API** | Geolocation & route optimization |
-| **OpenWeather API** | Weather forecasting |
+| **Open Route Service** | Geolocation & route optimization |
+| **Cloudinary** | Image Storage |
 | **SMTP Mail API** | Invite collaborators via email |
 
 ---
@@ -53,10 +53,8 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 
 ## 🤖 Chatbot Feature
 
-- Built with NLP prompts and integrated via Flask
 - Helps users with:
   - Trip suggestions
-  - Local language translations
   - FAQs and travel guidelines
 - Enhances accessibility and interaction on the platform
 
@@ -72,3 +70,14 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 cd frontend
 npm install
 npm run dev 
+
+2️⃣ Backend – Spring Boot (Java)
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+
+3️⃣ AI Engine – Python Flask Microservice
+```bash
+python save.py
+python app.py
