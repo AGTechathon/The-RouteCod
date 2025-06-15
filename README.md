@@ -25,8 +25,7 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 
 - ✈️ **Smart & Adaptive Itinerary Planning**  
 - 📍 **Location-Based Suggestions**  
-- 💬 **Interactive Chatbot Assistant**   
-- 📅 **Daily Schedule Optimizer**  
+- 💬 **Interactive Chatbot Assistant** 
 - 📸 **Nearby Places, Stays, Activities with Ratings**  
 - 🤝 **Collaborative Trip Management**  
 ---
@@ -70,14 +69,17 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 cd frontend
 npm install
 npm run dev 
+```
 
 2️⃣ Backend – Spring Boot (Java)
-
+```bash
 cd backend
 mvn clean install
 mvn spring-boot:run
+```
 
 3️⃣ AI Engine – Python Flask Microservice
-
+```bash
 python save.py
 python app.py
+```
