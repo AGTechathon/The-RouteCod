@@ -48,14 +48,6 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to="/contact"
-              className={`${linkBaseClasses} ${isScrolled ? 'hover:text-emerald-600' : 'hover:text-emerald-300'}`}
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            <Link
               to="/dashboard/plan"
               className={`px-4 py-2 rounded-full font-medium transition-all duration-300 hover:scale-105 ${
                 isScrolled
