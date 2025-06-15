@@ -11,6 +11,7 @@ if not MONGO_URI:
     raise ValueError("MONGO_URI is missing")
 
 def haversine(lon1, lat1, lon2, lat2):
+    """Calculate the great circle distance between two points on Earth."""
     R = 6371  # Earth radius in kilometers
     dlon = radians(lon2 - lon1)
     dlat = radians(lat2 - lat1)
@@ -19,6 +20,7 @@ def haversine(lon1, lat1, lon2, lat2):
     return R * c
 
 def is_lunch_time_slot(time_slot):
+    """Check if a time slot falls within lunch hours (12:00-14:00)."""
     try:
         start_time = datetime.strptime(time_slot.split("-")[0].strip(), "%H:%M").time()
         lunch_start = datetime.strptime("12:00", "%H:%M").time()
@@ -28,6 +30,7 @@ def is_lunch_time_slot(time_slot):
         return False
 
 def suggest_hotels(activities, user_input):
+    """Suggest hotels and lunch spots based on activity locations."""
     client = MongoClient(MONGO_URI)
     db = client["TripCraft"]
     collection = db["destination"]
@@ -67,6 +70,9 @@ def suggest_hotels(activities, user_input):
         day_map.setdefault(day, []).append(activity)
 
     suggestions = {}
+    used_lunch_names = set()  # Track used lunch spots
+    used_stay_names = set()   # Track used stay spots
+
     for day, activities in day_map.items():
         day_key = f"day{day}"
         suggestions[day_key] = {"lunch": {}, "stay": {}}
@@ -90,14 +96,18 @@ def suggest_hotels(activities, user_input):
                 )
             )
             for i, spot in enumerate(stay_sorted[:4], 1):
-                suggestions[day_key]["stay"][f"spot{i}"] = {
-                    "name": spot["name"],
-                    "location": spot["location"],
-                    "rating": float(spot["rating"]),
-                    "pricePerNight": int(spot["pricePerNight"]),
-                    "longitude": float(spot["longitude"]),
-                    "latitude": float(spot["latitude"])
-                }
+                if spot["name"] not in used_stay_names:  # Only add unused stays
+                    suggestions[day_key]["stay"][f"spot{i}"] = {
+                        "name": spot["name"],
+                        "location": spot["location"],
+                        "rating": float(spot["rating"]),
+                        "pricePerNight": int(spot["pricePerNight"]),
+                        "longitude": float(spot["longitude"]),
+                        "latitude": float(spot["latitude"])
+                    }
+                    used_stay_names.add(spot["name"])
+                if len(suggestions[day_key]["stay"]) >= 2:  # Limit to 2 unique stays
+                    break
 
         # Lunch suggestions (closest to lunch-time activity)
         lunch_activities = [a for a in day_activities if is_lunch_time_slot(a["time_slot"])]
@@ -111,13 +121,17 @@ def suggest_hotels(activities, user_input):
                 )
             )
             for i, spot in enumerate(lunch_sorted[:3], 1):
-                suggestions[day_key]["lunch"][f"spot{i}"] = {
-                    "name": spot["name"],
-                    "location": spot["location"],
-                    "rating": float(spot["rating"]),
-                    "price": int(spot["pricePerNight"]),  # Assuming this field is used for meal cost
-                    "longitude": float(spot["longitude"]),
-                    "latitude": float(spot["latitude"])
-                }
+                if spot["name"] not in used_lunch_names:  # Only add unused lunch spots
+                    suggestions[day_key]["lunch"][f"spot{i}"] = {
+                        "name": spot["name"],
+                        "location": spot["location"],
+                        "rating": float(spot["rating"]),
+                        "price": int(spot["pricePerNight"]),
+                        "longitude": float(spot["longitude"]),
+                        "latitude": float(spot["latitude"])
+                    }
+                    used_lunch_names.add(spot["name"])
+                if len(suggestions[day_key]["lunch"]) >= 1:  # Limit to 1 unique lunch spot
+                    break
 
     return suggestions
