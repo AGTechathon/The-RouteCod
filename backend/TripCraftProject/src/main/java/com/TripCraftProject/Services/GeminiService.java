@@ -28,7 +28,6 @@ public class GeminiService {
        private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Existing method for building itinerary prompt
     public String buildPrompt(String destination) {
         return String.format("""
             You are a smart travel planner.
@@ -38,39 +37,43 @@ public class GeminiService {
               "destination": "%s"
             }
 
-            Generate a JSON response with exactly two arrays:
-        	**unique data ** 
-            1. "spots" – Include **all possible unique tourist spots**  **at least 25 unique tourist spots**in and around the destination, covering:
+            Generate a JSON response with two arrays:
+
+            1. "spots" – Include exactly 25 unique and diverse tourist spots in and around the destination. For each spot, provide:
                - name
                - location
                - category (e.g., history, food, relaxation, adventure, nightlife, art, spiritual, nature, cultural, shopping)
                - rating (1 to 5)
-               - estimatedCost (approx. in INR)
+               - estimatedCost (in INR)
                - timeSlot (in format "HH:MM-HH:MM")
                - longitude
                - latitude
 
-            2. "hotels" – **at least 25 unique tourist hotels** Include a range of hotels from low to high budget near the above spots. For each hotel, provide:
+            2. "hotels" – Include exactly 30 unique hotels near the above tourist spots:
+               - 15 hotels with stayType "Stay" (for accommodation)
+               - 15 hotels with stayType "Lunch" (for dining)
+
+               For each hotel, provide:
                - name
                - location
                - category (e.g., Luxury, Budget, Casual Dining)
                - rating (1 to 5)
                - pricePerNight (in INR)
-               - stayType ("Stay" for accommodations, "Lunch" for dining)
+               - stayType ("Stay" or "Lunch")
                - longitude
                - latitude
                - nearbySpot (mention the closest tourist spot name)
 
-            Notes:
-            - Make sure all tourist spots listed are unique and exhaustive for the destination.
-            - Ensure hotels are relevant to nearby spots and represent all budget levels.
-            - Output only in valid **pure JSON** format like:
+            Guidelines:
+            - All entries must be unique and relevant to the given destination.
+            - Include a variety of categories and budget levels.
+            - Ensure hotel locations are near the tourist spots.
+            - Format output as pure valid JSON only. Example:
             {
               "spots": [ ... ],
               "hotels": [ ... ]
             }
-            """,
-            destination
+            """, destination
         );
     }
 

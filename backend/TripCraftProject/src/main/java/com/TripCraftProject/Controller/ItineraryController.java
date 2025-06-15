@@ -45,15 +45,31 @@ public class ItineraryController {
     // ✅ 4. Create a New Itinerary
     @PostMapping
     public ResponseEntity<?> createItinerary(@RequestBody Itinerary itinerary) {
-        // Check if the Trip exists
+        // Step 1: Check if the Trip exists
         Optional<Trip> trip = tripRepository.findById(itinerary.getTripId());
         if (trip.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message","Trip ID not found!"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Trip ID not found!"));
         }
 
-        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+     // Step 2: Check if itinerary with same tripId exists
+        Itinerary existing = itineraryRepository.findByTripId(itinerary.getTripId());
+        Itinerary savedItinerary;
+
+        if (existing != null) {
+            // Update the existing itinerary
+            existing.setItinerary(itinerary.getItinerary());
+            // Add any other fields to update here:
+            // existing.setField(itinerary.getField());
+            savedItinerary = itineraryRepository.save(existing);
+        } else {
+            // Create new itinerary
+            savedItinerary = itineraryRepository.save(itinerary);
+        }
+
         return ResponseEntity.ok(savedItinerary);
+
     }
+
 
     // ✅ 5. Update an Itinerary
     @PutMapping("/{id}")
