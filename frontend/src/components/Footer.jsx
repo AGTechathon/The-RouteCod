@@ -9,12 +9,6 @@ const Footer = () => {
             Explore the universe, one journey at a time.
           </p>
         </div>
-        <div className="flex space-x-8 text-gray-300 text-sm">
-          <a href="/about" className="hover:text-green-400 transition">About</a>
-          <a href="/" className="hover:text-green-400 transition">Services</a>
-          <a href="/" className="hover:text-green-400 transition">Contact</a>
-          <a href="/" className="hover:text-green-400 transition">Privacy Policy</a>
-        </div>
       </div>
       <div className="mt-10 text-center text-gray-500 text-xs">
         © {new Date().getFullYear()} TripCraft. All Rights Reserved.
