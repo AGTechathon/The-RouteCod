@@ -177,15 +177,10 @@ const ServiceSection = () => {
               AI-Powered Travel Enhancements
             </h2>
             <ul className="text-gray-700 space-y-2">
-              <li>AI-Powered Flight & Hotel Price Prediction</li>
-              <li>Real-Time Expense Tracking & Budget Alerts</li>
               <li>Personalized Travel Recommendations</li>
               <li>Smart Itinerary Optimization</li>
               <li>Automated Cost-Saving Suggestions</li>
-              <li>Group Expense Management & Bill Splitting</li>
               <li>AI Travel Assistant Chatbot</li>
-              <li>Multi-Currency Budgeting & Exchange Rate Updates</li>
-              <li>Dynamic Travel Insights Based on Spending Patterns</li>
             </ul>
           </div>
         </div>
