@@ -4,14 +4,14 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
-#Load environment variables
+# Load environment variables
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     raise ValueError("MONGO_URI is missing")
 
 def haversine(lon1, lat1, lon2, lat2):
-    R = 6371  #Earth radius in kilometers
+    R = 6371  # Earth radius in kilometers
     dlon = radians(lon2 - lon1)
     dlat = radians(lat2 - lat1)
     a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
@@ -27,7 +27,7 @@ def is_lunch_time_slot(time_slot):
     except ValueError:
         return False
 
-def suggest_hotels(activities,user_input):
+def suggest_hotels(activities, user_input):
     client = MongoClient(MONGO_URI)
     db = client["TripCraft"]
     collection = db["destination"]
@@ -47,6 +47,17 @@ def suggest_hotels(activities,user_input):
         raise ValueError("Destination not found in database")
 
     hotels = destination_doc.get("hotels", [])
+    # Validate hotel coordinates
+    valid_hotels = []
+    for hotel in hotels:
+        lat = float(hotel.get("latitude", 0))
+        lon = float(hotel.get("longitude", 0))
+        if lat == 0 or lon == 0:
+            print(f"Skipping hotel '{hotel.get('name', 'Unknown')}' due to invalid coordinates")
+            continue
+        valid_hotels.append(hotel)
+    hotels = valid_hotels
+
     stay_hotels = [h for h in hotels if h.get("stayType") == "Stay"]
     lunch_restaurants = [h for h in hotels if h.get("stayType") == "Lunch"]
 
@@ -68,7 +79,7 @@ def suggest_hotels(activities,user_input):
             continue
         day_activities.sort(key=lambda a: a["time_slot"])
 
-        #Stay suggestions (closest to last activity)
+        # Stay suggestions (closest to last activity)
         last_activity = day_activities[-1]
         if stay_hotels:
             stay_sorted = sorted(
@@ -88,7 +99,7 @@ def suggest_hotels(activities,user_input):
                     "latitude": float(spot["latitude"])
                 }
 
-        #Lunch suggestions (closest to lunch-time activity)
+        # Lunch suggestions (closest to lunch-time activity)
         lunch_activities = [a for a in day_activities if is_lunch_time_slot(a["time_slot"])]
         if lunch_activities and lunch_restaurants:
             lunch_activity = lunch_activities[0]
@@ -104,7 +115,7 @@ def suggest_hotels(activities,user_input):
                     "name": spot["name"],
                     "location": spot["location"],
                     "rating": float(spot["rating"]),
-                    "price": int(spot["pricePerNight"]),  #Assuming this field is used for meal cost
+                    "price": int(spot["pricePerNight"]),  # Assuming this field is used for meal cost
                     "longitude": float(spot["longitude"]),
                     "latitude": float(spot["latitude"])
                 }

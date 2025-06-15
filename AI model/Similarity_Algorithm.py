@@ -1,4 +1,4 @@
-#To group the similar activities together based on user preferences 
+# To group the similar activities together based on user preferences 
 
 from dotenv import load_dotenv
 import os
@@ -184,6 +184,8 @@ def fetch_low_cost_activities(destination, budget, people, required_activities):
     
     low_cost_spots.sort(key=lambda x: x[0])
     result = [spot[1] for spot in low_cost_spots[:required_activities]]
+    if not result:
+        print("fetch_low_cost_activities: No activities with valid coordinates found")
     print(f"fetch_low_cost_activities: Returning {len(result)} activities in {time.time() - start_time:.2f}s")
     return result
 
@@ -283,5 +285,7 @@ def find_similar_activities(destination, preferences, budget, people, days):
         all_spots.sort(key=lambda x: (x["rating"], -x["activity"]["estimatedCost"]))
     
     result = all_spots[:required_activities]
+    if not result:
+        print("find_similar_activities: No activities with valid coordinates found")
     print(f"find_similar_activities: Returning {len(result)} activities in {time.time() - start_time:.2f}s")
     return result

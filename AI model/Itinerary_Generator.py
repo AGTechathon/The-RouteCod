@@ -1,4 +1,4 @@
-#To generate the itinerary based on the similarity_algorithm, route optimization and budget given by the user
+# To generate the itinerary based on the similarity_algorithm, route optimization and budget given by the user
 
 import numpy as np
 import pandas as pd
@@ -95,7 +95,10 @@ def generate_itinerary(user_input):
             valid_activities.append(activity)
             locations.append((lon, lat))
 
-    distance_matrix, time_matrix = fetch_distance_matrix(locations)
+    distance_matrix, time_matrix, filtered_locations = fetch_distance_matrix(locations)
+    filtered_indices = [i for i, loc in enumerate(locations) if loc in filtered_locations]
+    
+    valid_activities = [valid_activities[i] for i in filtered_indices]
     for i, a in enumerate(valid_activities):
         a["matrix_index"] = i
         a["id"] = i
