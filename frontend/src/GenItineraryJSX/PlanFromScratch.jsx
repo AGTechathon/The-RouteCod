@@ -6,7 +6,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { ItineraryDay } from './components/ItineraryDay';
 import { useItineraryStore } from './store/itineraryStore';
@@ -19,6 +19,8 @@ function PlanFromScratch() {
   const [saveError, setSaveError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const location = useLocation();
+  const { mode } = useParams(); // Get the mode from the route parameter
+  const isEditMode = mode === 'edit'; // Determine if we're in edit mode
 
   const {
     days,
@@ -43,32 +45,46 @@ function PlanFromScratch() {
 
   useEffect(() => {
     if (location.state) {
-      const { tripId, tripData, lunch, stay, spots } = location.state;
+      const { tripId, tripData, lunch, stay, spots, itinerary } = location.state;
       setTitle(tripData.title);
       setDestination(tripData.destination);
       setDates(tripData.startDate, tripData.endDate);
       setBudget(tripData.budget);
       setSuggestedPeople(tripData.people);
       setTripId(tripId);
-      setRecommendations({
-        lunch: lunch || [],
-        stay: stay || [],
-        spots: spots || [],
-      });
 
-      const start = new Date(tripData.startDate);
-      const end = new Date(tripData.endDate);
-      const dayCount = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-      const newDays = Array.from({ length: dayCount }, (_, i) => {
-        const date = new Date(start);
-        date.setDate(start.getDate() + i);
-        return {
-          id: crypto.randomUUID(),
-          date: date.toISOString().split('T')[0],
-          items: [],
-        };
-      });
-      setDays(newDays);
+      if (isEditMode && itinerary) {
+        // Edit mode: Load existing itinerary data
+        setDays(itinerary.map(day => ({
+          id: day.id || crypto.randomUUID(),
+          date: day.date,
+          items: day.items.map(item => ({
+            ...item,
+            id: item.id || crypto.randomUUID(),
+          })),
+        })));
+        setRecommendations({}); // No recommendations in edit mode
+      } else {
+        // Generate mode: Set up empty days and recommendations
+        setRecommendations({
+          lunch: lunch || [],
+          stay: stay || [],
+          spots: spots || [],
+        });
+        const start = new Date(tripData.startDate);
+        const end = new Date(tripData.endDate);
+        const dayCount = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        const newDays = Array.from({ length: dayCount }, (_, i) => {
+          const date = new Date(start);
+          date.setDate(start.getDate() + i);
+          return {
+            id: crypto.randomUUID(),
+            date: date.toISOString().split('T')[0],
+            items: [],
+          };
+        });
+        setDays(newDays);
+      }
     } else {
       toast.error('No trip data found. Please create a trip first.');
       setTitle('');
@@ -82,6 +98,7 @@ function PlanFromScratch() {
     }
   }, [
     location.state,
+    isEditMode,
     setTitle,
     setDestination,
     setDates,
@@ -227,9 +244,12 @@ function PlanFromScratch() {
       <Toaster position="top-right" />
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="flex h-screen bg-gray-50">
-          <div className="w-80 bg-white shadow-lg flex flex-col">
-            <Sidebar recommendations={recommendations} />
-          </div>
+          {/* Show sidebar only in generate mode */}
+          {!isEditMode && (
+            <div className="w-80 bg-white shadow-lg flex flex-col">
+              <Sidebar recommendations={recommendations} />
+            </div>
+          )}
           <div className="flex-1 flex flex-col">
             <div className="bg-white shadow-sm border-b">
               <div className="px-8 py-6">
@@ -246,7 +266,7 @@ function PlanFromScratch() {
                   <button
                     onClick={handleSaveItinerary}
                     disabled={isSaving || !tripId}
-                    className={`flex items-center gap  gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
                       isSaving || !tripId
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl'
