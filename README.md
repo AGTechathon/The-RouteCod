@@ -24,13 +24,11 @@ To create a personalized, adaptive, and collaborative travel planning web applic
 ## 🧠 Key Features
 
 - ✈️ **Smart & Adaptive Itinerary Planning**  
-- 🤝 **Collaborative Trip Management**  
 - 📍 **Location-Based Suggestions**  
-- 💬 **Interactive Chatbot Assistant**  
-- 🌐 **Real-Time Weather & Traffic Insights**  
+- 💬 **Interactive Chatbot Assistant**   
 - 📅 **Daily Schedule Optimizer**  
 - 📸 **Nearby Places, Stays, Activities with Ratings**  
-
+- 🤝 **Collaborative Trip Management**  
 ---
 
 ## 🧰 Tech Stack
