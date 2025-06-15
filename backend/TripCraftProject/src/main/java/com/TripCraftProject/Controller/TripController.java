@@ -169,12 +169,12 @@ public class TripController {
 
         
         Destination destination;
-        if(!destinationOpt.isPresent() || destinationOpt.isEmpty() ) {
+        if( destinationOpt.isEmpty() ) {
         	destination = callGeminiService(trip.getDestination());
         }
-        if (destinationOpt.isPresent()) {
+        else{
              destination = destinationOpt.get();
-            
+        }
             // ✅ Spots
             if (destination.getSpots() != null) {
                 spots = destination.getSpots();
@@ -190,7 +190,7 @@ public class TripController {
                     }
                 }
             }
-        }
+        
 
 
         // ✅ Build the response
