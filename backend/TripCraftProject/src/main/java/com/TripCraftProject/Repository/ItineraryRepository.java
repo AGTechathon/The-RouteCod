@@ -13,4 +13,6 @@ public interface ItineraryRepository extends MongoRepository<Itinerary, String>{
 
 	 List<Itinerary> findByTripIdIn(List<String> tripIds); 
 	 Itinerary findByTripId(String tripId);
+	 
+	 
 }
