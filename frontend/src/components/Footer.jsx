@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 
 // Team member data with profile images
 const teamMembers = [
-  { id: 1, name: "Priyanka Sundalam", image: "./img/bbg1.jpg" },
-  { id: 2, name: "Aditi Deshpande", image: "./img/bbg2.jpg" },
-  { id: 3, name: "Ankita Advitot", image: "./img/bbg3.jpg" },
-  { id: 4, name: "Tejas Jahagirdar", image: "./img/bbg4.jpg" },
+  { id: 1, name: "Priyanka Sundalam", image: "./img/priyanka1.jpg" },
+  { id: 2, name: "Aditi Deshpande", image: "./img/aditi.jpg" },
+  { id: 3, name: "Ankita Advitot", image: "./img/ankita.jpg" },
+  { id: 4, name: "Tejas Jahagirdar", image: "./img/tejas.jpg" },
 ];
 
 const Footer = () => {
