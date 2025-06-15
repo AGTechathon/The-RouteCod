@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// Team member data
+// Team member data with profile images
 const teamMembers = [
   { id: 1, name: 'Priyanka Sundalam', image: './img/bbg1.jpg' },
   { id: 2, name: 'Aditi Deshpande', image: './img/bbg2.jpg' },
@@ -19,11 +19,11 @@ const Footer = () => {
   // Animation variants for name
   const nameVariants = {
     initial: { opacity: 0, y: 10 },
-    hover: { opacity: 1, y: 20, transition: { duration: 0.3 } }, // Increased y for downward slide
+    hover: { opacity: 1, y: 20, transition: { duration: 0.3 } },
   };
 
   return (
-    <footer className="bg-gray-900 text-white py-10">
+    <footer className="bg-gray-900 text-white py-8 w-full border-t border-gray-700">
       <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
         {/* Left Side: Logo and Tagline */}
         <div className="mb-6 md:mb-0 text-center md:text-left">
@@ -45,7 +45,7 @@ const Footer = () => {
               <motion.img
                 src={member.image}
                 alt={member.name}
-                className="w-15 h-15 rounded-full object-cover border-2 border-blue-600"
+                className="w-14 h-14 rounded-full object-cover border-2 border-blue-600"
                 variants={imageVariants}
               />
               <motion.span
@@ -58,7 +58,7 @@ const Footer = () => {
           ))}
         </div>
       </div>
-      <div className="mt-10 text-center text-gray-500 text-xs">
+      <div className="mt-8 text-center text-gray-500 text-xs">
         © {new Date().getFullYear()} TripCraft. All Rights Reserved.
       </div>
     </footer>
